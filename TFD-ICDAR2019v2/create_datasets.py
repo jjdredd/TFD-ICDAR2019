@@ -16,12 +16,14 @@ def create_pmath(input_csv, output_dir):
     data = genfromtxt(input_csv, delimiter=',', dtype=int)
     file_dir = os.path.join(output_dir, file_basename)
     os.makedirs(file_dir, exist_ok=True)
+    pages = []
 
     i = 0
     while i < data.shape[0]:
         j = data[i][0]
         fname = "{}.pmath".format(str(j))
         fd_out = open(os.path.join(file_dir, fname), 'w')
+        pages.append("{}/{}".format(file_basename, j))
         while j == data[i][0]:
             fd_out.write("{}, {}, {}, {}\n"
                          .format(data[i][1], data[i][2],
@@ -30,7 +32,7 @@ def create_pmath(input_csv, output_dir):
             if i == data.shape[0]:
                 fd_out.close()
                 break
-    return (i > 0)
+    return pages
 
 def create_images(input_pdf, output_dir):
     """ convert pdf pages to individual png with density 600
@@ -64,16 +66,20 @@ dataset_images = os.path.join(args.dataset_dir, 'images')
 dataset_annotations = os.path.join(args.dataset_dir, 'annotations')
 os.makedirs(dataset_images, exist_ok=True)
 os.makedirs(dataset_annotations, exist_ok=True)
+ds_list = []
+i = 0
 
-ds_file = open(os.path.join(args.dataset_dir, 'data_file.txt'), 'w')
 for annot_file in glob.glob(os.path.join(args.annotations_dir, '*.csv')):
-    ca = create_pmath(annot_file, dataset_annotations)
+    pages = create_pmath(annot_file, dataset_annotations)
     file_basename = os.path.splitext(os.path.basename(annot_file))[0]
     pdf_file = file_basename + '.pdf'
     ci = create_images(os.path.join(args.pdf_dir, pdf_file), dataset_images)
-    if ci and ca:
-        ds_file.write('{}\n'.format(file_basename))
+    if ci:
+        ds_list.extend(pages)
         print(file_basename)
 
 
+ds_file = open(os.path.join(args.dataset_dir, 'data_file.txt'), 'w')
+for entry in ds_list:
+    ds_file.write("{}\n".format(entry))
 ds_file.close()

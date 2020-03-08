@@ -14,12 +14,14 @@ def create_pmath(input_csv, output_dir):
 
     file_basename = os.path.splitext(os.path.basename(input_csv))[0]
     data = genfromtxt(input_csv, delimiter=',', dtype=int)
+    file_dir = os.path.join(output_dir, file_basename)
+    os.makedirs(file_dir, exist_ok=True)
 
     i = 0
     while i < data.shape[0]:
         j = data[i][0]
-        fname = file_basename + '-' +  str(j) + '.pmath'
-        fd_out = open(os.path.join(output_dir, fname), 'a')
+        fname = "{}.pmath".format(str(j))
+        fd_out = open(os.path.join(file_dir, fname), 'a')
         while j == data[i][0]:
             fd_out.write("{}, {}, {}, {}\n"
                          .format(data[i][1], data[i][2],
@@ -35,8 +37,12 @@ def create_images(input_pdf, output_dir):
     should be correct"""
 
     file_basename = os.path.splitext(os.path.basename(input_pdf))[0]
-    ret = os.system("convert -limit memory 4GB -density 600 {} {}-%d.png"
-              .format(input_pdf, os.path.join(output_dir, file_basename)))
+    file_dir = os.path.join(output_dir, file_basename)
+    os.makedirs(file_dir, exist_ok=True)
+    filename = os.path.join(file_dir, "%d.png")
+
+    ret = os.system("convert -limit memory 4GB -density 600 {} {}"
+              .format(input_pdf, os.path.join(output_dir, filename)))
 
     if os.WIFEXITED(ret):
         return (os.WEXITSTATUS(ret) == 0)

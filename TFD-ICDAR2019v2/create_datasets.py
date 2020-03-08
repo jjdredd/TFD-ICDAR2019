@@ -21,7 +21,7 @@ def create_pmath(input_csv, output_dir):
     while i < data.shape[0]:
         j = data[i][0]
         fname = "{}.pmath".format(str(j))
-        fd_out = open(os.path.join(file_dir, fname), 'a')
+        fd_out = open(os.path.join(file_dir, fname), 'w')
         while j == data[i][0]:
             fd_out.write("{}, {}, {}, {}\n"
                          .format(data[i][1], data[i][2],

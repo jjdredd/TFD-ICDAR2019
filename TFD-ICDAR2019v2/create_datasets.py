@@ -44,7 +44,7 @@ def create_images(input_pdf, output_dir):
     filename = os.path.join(file_dir, "%d.png")
 
     ret = os.system("convert -limit memory 3GB -density 600 {} {}"
-              .format(input_pdf, os.path.join(output_dir, filename)))
+                    .format(input_pdf, filename))
 
     if os.WIFEXITED(ret):
         return (os.WEXITSTATUS(ret) == 0)
